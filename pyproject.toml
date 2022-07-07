@@ -1,7 +1,7 @@
 [tool.kedro]
-package_name = "veh_insurance_claim"
+package_name = "veh_claims"
 project_name = "Vehicle Insurance Claim Fraud Detection"
-project_version = "0.18.1"
+project_version = "0.17.0"
 
 [tool.isort]
 multi_line_output = 3
@@ -14,9 +14,4 @@ known_third_party = "kedro"
 [tool.pytest.ini_options]
 addopts = """
 --cov-report term-missing \
---cov src/veh_insurance_claim -ra"""
-
-[tool.coverage.report]
-fail_under = 0
-show_missing = true
-exclude_lines = ["pragma: no cover", "raise NotImplementedError"]
+--cov src/veh_claims -ra"""

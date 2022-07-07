@@ -26,43 +26,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import find_packages, setup
+"""Project hooks."""
+from typing import Any, Dict, Iterable, Optional
 
-entry_point = (
-    "veh_claims = veh_claims.run:run_package"
-)
+from kedro.config import ConfigLoader
+from kedro.framework.hooks import hook_impl
+from kedro.io import DataCatalog
+from kedro.pipeline import Pipeline
+from kedro.versioning import Journal
+
+from veh_claims.pipelines.processing import pipeline as processing_pipeline
 
 
-# get the dependencies and installs
-with open("requirements.txt", "r", encoding="utf-8") as f:
-    # Make sure we strip all comments and options (e.g "--extra-index-url")
-    # that arise from a modified pip.conf file that configure global options
-    # when running kedro build-reqs
-    requires = []
-    for line in f:
-        req = line.split("#", 1)[0].strip()
-        if req and not req.startswith("--"):
-            requires.append(req)
+class ProjectHooks:
+    @hook_impl
+    def register_pipelines(self) -> Dict[str, Pipeline]:
+        """Register the project's pipeline.
 
-setup(
-    name="veh_claims",
-    version="0.1",
-    packages=find_packages(exclude=["tests"]),
-    entry_points={"console_scripts": [entry_point]},
-    install_requires=requires,
-    extras_require={
-        "docs": [
-            "sphinx>=1.6.3, <2.0",
-            "sphinx_rtd_theme==0.4.1",
-            "docutils",
-            "nbsphinx==0.3.4",
-            "nbstripout==0.3.3",
-            "recommonmark==0.5.0",
-            "sphinx-autodoc-typehints==1.6.0",
-            "sphinx_copybutton==0.2.5",
-            "jupyter_client>=5.1.0, <7.0",
-            "tornado~=6.1",
-            "ipykernel~=5.3",
-        ]
-    },
-)
+        Returns:
+            A mapping from a pipeline name to a ``Pipeline`` object.
+
+        """
+        p_processing = processing_pipeline.create_pipeline()
+
+        return {"processing": p_processing}
+
+    @hook_impl
+    def register_config_loader(self, conf_paths: Iterable[str]) -> ConfigLoader:
+        return ConfigLoader(conf_paths)
+
+    @hook_impl
+    def register_catalog(
+        self,
+        catalog: Optional[Dict[str, Dict[str, Any]]],
+        credentials: Dict[str, Dict[str, Any]],
+        load_versions: Dict[str, str],
+        save_version: str,
+        journal: Journal,
+    ) -> DataCatalog:
+        return DataCatalog.from_config(
+            catalog, credentials, load_versions, save_version, journal
+        )

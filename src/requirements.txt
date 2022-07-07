@@ -15,3 +15,10 @@ pandas
 hyperopt
 lightgbm
 sklearn
+matplotlib
+seaborn
+pandasql
+xgboost
+hpsklearn
+category_encoders
+tabulate

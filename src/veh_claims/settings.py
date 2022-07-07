@@ -26,43 +26,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import find_packages, setup
+"""Project settings."""
+from veh_claims.hooks import ProjectHooks
 
-entry_point = (
-    "veh_claims = veh_claims.run:run_package"
-)
+# Instantiate and list your project hooks here
+HOOKS = (ProjectHooks(),)
 
+# List the installed plugins for which to disable auto-registry
+# DISABLE_HOOKS_FOR_PLUGINS = ("kedro-viz",)
 
-# get the dependencies and installs
-with open("requirements.txt", "r", encoding="utf-8") as f:
-    # Make sure we strip all comments and options (e.g "--extra-index-url")
-    # that arise from a modified pip.conf file that configure global options
-    # when running kedro build-reqs
-    requires = []
-    for line in f:
-        req = line.split("#", 1)[0].strip()
-        if req and not req.startswith("--"):
-            requires.append(req)
+# Define where to store data from a KedroSession. Defaults to BaseSessionStore.
+# from kedro.framework.session.store import ShelveStore
+# SESSION_STORE_CLASS = ShelveStore
 
-setup(
-    name="veh_claims",
-    version="0.1",
-    packages=find_packages(exclude=["tests"]),
-    entry_points={"console_scripts": [entry_point]},
-    install_requires=requires,
-    extras_require={
-        "docs": [
-            "sphinx>=1.6.3, <2.0",
-            "sphinx_rtd_theme==0.4.1",
-            "docutils",
-            "nbsphinx==0.3.4",
-            "nbstripout==0.3.3",
-            "recommonmark==0.5.0",
-            "sphinx-autodoc-typehints==1.6.0",
-            "sphinx_copybutton==0.2.5",
-            "jupyter_client>=5.1.0, <7.0",
-            "tornado~=6.1",
-            "ipykernel~=5.3",
-        ]
-    },
-)
+# Define keyword arguments to be passed to `SESSION_STORE_CLASS` constructor
+# SESSION_STORE_ARGS = {
+#     "path": "./sessions"
+# }
+
+# Define custom context class. Defaults to `KedroContext`
+# CONTEXT_CLASS = KedroContext
+
+# Define the configuration folder. Defaults to `conf`
+# CONF_ROOT = "conf"
