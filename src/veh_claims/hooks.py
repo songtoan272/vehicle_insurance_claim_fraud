@@ -36,6 +36,7 @@ from kedro.pipeline import Pipeline
 from kedro.versioning import Journal
 
 from veh_claims.pipelines.processing import pipeline as processing_pipeline
+from veh_claims.pipelines.training import pipeline as training_pipeline
 
 
 class ProjectHooks:
@@ -48,8 +49,9 @@ class ProjectHooks:
 
         """
         p_processing = processing_pipeline.create_pipeline()
+        p_training = training_pipeline.create_pipeline()
 
-        return {"processing": p_processing}
+        return {"processing": p_processing, "training": p_training}
 
     @hook_impl
     def register_config_loader(self, conf_paths: Iterable[str]) -> ConfigLoader:

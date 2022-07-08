@@ -6,13 +6,21 @@ from typing import Callable, Tuple, Any, Dict
 from sklearn.base import BaseEstimator
 from sklearn.metrics import f1_score
 from sklearn.model_selection import RepeatedKFold
+from sklearn.tree import plot_tree
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 
 from lightgbm.sklearn import LGBMClassifier
+from xgboost import XGBClassifier
+from xgboost import plot_tree
+from xgboost import plot_importance
 
-from hyperopt import hp, tpe, fmin
+from hyperopt import hp, tpe, fmin, STATUS_OK, Trials
 
 import warnings
-warnings.filterwarnings('ignore')
+
+warnings.filterwarnings("ignore")
+
 
 MODELS = [
     {
@@ -42,7 +50,7 @@ MODELS = [
 
 
 def train_model(
-    instance: BaseEstimator,
+    instance,
     training_set: Tuple[np.ndarray, np.ndarray],
     params: Dict = {},
 ) -> BaseEstimator:
@@ -61,12 +69,12 @@ def train_model(
 
 
 def optimize_hyp(
-    instance: BaseEstimator,
+    instance,
     dataset: Tuple[np.ndarray, np.ndarray],
     search_space: Dict,
     metric: Callable[[Any, Any], float],
     max_evals: int = 40,
-) -> BaseEstimator:
+):
     """
     Trains model's instances on hyper-parameters search space and returns most accurate
     hyper-parameters based on eval set.
@@ -85,12 +93,10 @@ def optimize_hyp(
             model = train_model(
                 instance=instance,
                 training_set=(X_fold_train, y_fold_train),
-                params=params
+                params=params,
             )
             # On calcule le score du modèle sur le test
-            scores_test.append(
-                metric(y_fold_test, model.predict(X_fold_test))
-            )
+            scores_test.append(metric(y_fold_test, model.predict(X_fold_test)))
 
         return np.mean(scores_test)
 
@@ -102,8 +108,8 @@ def auto_ml(
     y_train: np.ndarray,
     X_test: np.ndarray,
     y_test: np.ndarray,
-    max_evals: int = 40
-) -> BaseEstimator:
+    max_evals: int = 40,
+):
     """
     Runs training of multiple model instances and select the most accurated based on objective function.
     """
@@ -118,7 +124,7 @@ def auto_ml(
             dataset=(X, y),
             search_space=model_specs["params"],
             metric=lambda x, y: -f1_score(x, y),
-            max_evals=max_evals
+            max_evals=max_evals,
         )
         print("done")
         # Training the supposed best model with found hyper-parameters
